@@ -14,10 +14,42 @@ def get_path():
     return path
 
 
+def get_depth():
+    """
+    Returns an number representation of how deep the directory hierarchy
+    should be described.
+    """
+    try:
+        depth = sys.argv[2]
+    except IndexError:
+        depth = 2
+
+    return int(depth)
+
+
+def print_directory_element(depth, element):
+    """
+    Prints the specified element with depth blank spaces
+    """
+    print(depth*2*" " + "- " + element)
+
+
+def describe_directory(max_depth, current_depth, path):
+    """
+    Roam specified directory describing it's elements.
+    """
+    if current_depth == max_depth:
+        return
+    try:
+        for element in os.listdir(path):
+            print_directory_element(current_depth, element)
+            next_path = os.path.join(path, element)
+            if os.path.isdir(os.path.join(path, element)):
+                describe_directory(max_depth, current_depth+1, next_path)
+    except FileNotFoundError:
+        print("Cannot find specified path.")
+
+
 current_directory = get_path()
-try:
-    directory_elements = os.listdir(current_directory)
-    for element in directory_elements:
-        print("-" + element)
-except FileNotFoundError:
-    print("Cannot find specified path.")
+max_depth = get_depth()
+describe_directory(max_depth, 1, current_directory)
